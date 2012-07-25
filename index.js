@@ -65,6 +65,7 @@ module.exports = function (write, end) {
   // if you overide it, you are resposible
   // for pause state.
 
+  stream.emitData =
   stream.sendData = function (data) {
     if(!stream.paused && !buffer.length)
       stream.emit('data', data)
@@ -73,6 +74,7 @@ module.exports = function (write, end) {
     return !(this.paused || buffer.length)
   }
 
+  stream.emitEnd =
   stream.sendEnd = function (data) {
     if(data) stream.write(data)
     if(emitEnd) return
