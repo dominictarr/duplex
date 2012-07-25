@@ -1,6 +1,6 @@
 # duplex
 
-Simple base class for [duplex](https://github.com/dominictarr/stream-spec#duplex) streams, that automaticall handles pausing and buffering.
+Simple base class for [duplex](https://github.com/dominictarr/stream-spec#duplex) streams, that automatically handles pausing and buffering.
 
 ``` js
 
