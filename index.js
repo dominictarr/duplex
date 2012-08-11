@@ -1,4 +1,3 @@
-
 var Stream = require('stream')
 
 /*
@@ -71,7 +70,7 @@ module.exports = function (write, end) {
       stream.emit('data', data)
     else 
       buffer.push(data) 
-    return !(this.paused || buffer.length)
+    return !(stream.paused || buffer.length)
   }
 
   stream.emitEnd =
@@ -130,13 +129,13 @@ module.exports = function (write, end) {
     if(destroyed) return
     destroyed = ended = true     
     buffer.length = 0
-    this.emit('close')
+    stream.emit('close')
   }
   var pauseCalled = false
   stream.pause = function () {
     started = true
     stream.paused = true
-    return this
+    return stream
   }
   stream.paused = true
   process.nextTick(function () {
