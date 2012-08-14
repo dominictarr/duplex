@@ -106,9 +106,11 @@ module.exports = function (write, end) {
         stream.readable = false
         stream.emit('end')
         return
-      } return true
+      } else {
+        //if the buffer has emptied. emit drain.
+        return true
+      }
     }
-    //if the buffer has emptied. emit drain.
   }
   var started = false
   stream.resume = function () {
