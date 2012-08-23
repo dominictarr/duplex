@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/dominictarr/duplex.png)](http://travis-ci.org/dominictarr/duplex)
 # duplex
 
 Simple base class for [duplex](https://github.com/dominictarr/stream-spec#duplex) streams, that automatically handles pausing and buffering.
