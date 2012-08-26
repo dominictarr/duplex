@@ -1,5 +1,8 @@
 # duplex
 
+<img src=https://secure.travis-ci.org/dominictarr/duplex.png?branch=master>
+
+
 Simple base class for [duplex](https://github.com/dominictarr/stream-spec#duplex) streams, that automatically handles pausing and buffering.
 
 ``` js
