@@ -75,7 +75,6 @@ test('end() & emit(\'end\') -> emit(\'close\')', function(d){
   var a = false
 
   d.on('close', function () {
-
     a = true
   })
 
@@ -83,8 +82,9 @@ test('end() & emit(\'end\') -> emit(\'close\')', function(d){
   d.sendEnd()
   d.end()
   d.resume()
-  assert(a, true, 'destroy is called after both ends finish')
-
+  process.nextTick(function () {
+    assert(a, true, 'destroy is called after both ends finish')
+  })
 })
 
 test('start in nextTick', function () {
