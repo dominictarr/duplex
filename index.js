@@ -47,11 +47,15 @@ module.exports = function (write, end) {
     stream.on('ended', end)
 
   //destroy the stream once both ends are over
-
+  //but do it in nextTick, so that other listeners
+  //on end have time to respond
   stream.once('end', function () { 
     stream.readable = false
-    if(!stream.writable)
-      stream.destroy()
+    if(!stream.writable) {
+      process.nextTick(function () {
+        stream.destroy()
+      })
+    }
   })
 
   stream.once('ended', function () { 
@@ -75,7 +79,7 @@ module.exports = function (write, end) {
 
   stream.emitEnd =
   stream.sendEnd = function (data) {
-    if(data) stream.write(data)
+    if(data) stream.emitData(data)
     if(emitEnd) return
     emitEnd = true
     //destroy is handled above.
