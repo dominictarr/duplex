@@ -7,9 +7,9 @@ function test(message, func) {
 }
 
 
-test("write(data) -> emit('write', data)", function (d) {
+test("write(data) -> emit('_data', data)", function (d) {
   var a = null
-  d.on('write', function (d) {
+  d.on('_data', function (d) {
     a = d
   })
   var e = Math.random()
@@ -26,7 +26,7 @@ test("emit('pause') -> write(data) === false", function (d) {
   assert(d.write(), true)
 })
 
-test("sendData(data) -> emit('data', data)", function (d) {
+test("_data(data) -> emit('data', data)", function (d) {
 
   var a = null, e
   d.on('data', function (d) {
@@ -34,13 +34,13 @@ test("sendData(data) -> emit('data', data)", function (d) {
   })
   d.pause()
   assert.equal(a, null)  
-  d.sendData(e = Math.random())
+  d._data(e = Math.random())
   assert.equal(a, null)
   d.resume()
   assert.equal(a, e) 
 })
 
-test("sendEnd(data) -> emit('end', data)", function (d) {
+test("_end(data) -> emit('end', data)", function (d) {
 
   var a = false
 
@@ -49,17 +49,17 @@ test("sendEnd(data) -> emit('end', data)", function (d) {
   })
 
   d.pause()
-  d.sendEnd()
+  d._end()
   assert.equal(a, false, 'pause should buffer end')
   d.resume()
   assert.equal(a, true, 'resume should drain end')
   assert.equal(d.readable, false, 'emitting end should set readable = false')
 })
 
-test('end() -> emit(\'ended\')', function (d) {
+test('end() -> emit(\'_end\')', function (d) {
 
   var a = false
-  d.on('ended', function (d) {
+  d.on('_end', function (d) {
     a = true
   })
 
@@ -79,7 +79,7 @@ test('end() & emit(\'end\') -> emit(\'close\')', function(d){
   })
 
   assert.equal(a, false)
-  d.sendEnd()
+  d._end()
   d.end()
   d.resume()
   process.nextTick(function () {
@@ -99,7 +99,7 @@ test('start in nextTick', function () {
     a = data
   })
 
-  d.sendData(e = Math.random())
+  d._data(e = Math.random())
   
   process.nextTick(function () {
     assert.equal(a, e)
