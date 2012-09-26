@@ -9,11 +9,11 @@ var Stream = require('stream')
 
   idea:
 
-    write -> emit('write')
+    write -> emit('_data')
 
-    on('pause') --> writePause = true
+    on('pause') --> _paused = true
     if(writePause) --> wirte() == false
-    on('drain') --> writePause = false
+    on('drain') --> _paused = false
 
     pause() -> paused = true
     resume() -> paused = false, drain()
@@ -26,15 +26,18 @@ module.exports = function (write, end) {
   var buffer = [], ended = false, destroyed = false, emitEnd
   stream.writable = stream.readable = true
   stream.paused = false
+  stream._paused = false
   stream.buffer = buffer
   
   stream.writePause = false
   stream
     .on('pause', function () {
-      stream.writePause = true
+      stream.writePause = true //LEGACY, DO NOT USE
+      stream._paused = true
     })
     .on('drain', function () {
-      stream.writePause = false
+      stream.writePause = false //LEGACY, DO NOT USE
+      stream._paused = false
     })
    
   function destroySoon () {
@@ -58,7 +61,7 @@ module.exports = function (write, end) {
     }
   })
 
-  stream.once('ended', function () { 
+  stream.once('_end', function () { 
     stream.writable = false
     if(!stream.readable)
       stream.destroy()
@@ -68,17 +71,20 @@ module.exports = function (write, end) {
   // if you overide it, you are resposible
   // for pause state.
 
-  stream.emitData =
-  stream.sendData = function (data) {
+  
+  stream.emitData = //LEGACY, DO NOT USE
+  stream.sendData = //LEGACY, DO NOT USE
+  stream._data = function (data) {
     if(!stream.paused && !buffer.length)
       stream.emit('data', data)
     else 
-      buffer.push(data) 
+      buffer.push(data)
     return !(stream.paused || buffer.length)
   }
 
-  stream.emitEnd =
-  stream.sendEnd = function (data) {
+  stream.emitEnd = //LEGACY, DO NOT USE
+  stream.sendEnd = //LEGACY, DO NOT USE
+  stream._end = function (data) { 
     if(data) stream.emitData(data)
     if(emitEnd) return
     emitEnd = true
@@ -87,15 +93,18 @@ module.exports = function (write, end) {
   }
 
   stream.write = function (data) {
-    stream.emit('write', data)
+    stream.emit('write', data) //LEGACY, DO NOT USE
+    stream.emit('_data', data)
     return !stream.writePaused
   }
   stream.end = function () {
     stream.writable = false
     if(stream.ended) return
     stream.ended = true
-    stream.emit('ended')
+    stream.emit('ended') //LEGACY, DO NOT USE
+    stream.emit('_end')
   }
+
   stream.drain = function () {
     if(!buffer.length && !emitEnd) return
     //if the stream is paused after just before emitEnd()
@@ -103,8 +112,10 @@ module.exports = function (write, end) {
     while(!stream.paused) {
       if(buffer.length) {
         stream.emit('data', buffer.shift())
-        if(buffer.length == 0)
-          stream.emit('read-drain')
+        if(buffer.length == 0) {
+          stream.emit('read-drain') //LEGACY, DO NOT USE
+          stream.emit('_drain')
+        }
       }
       else if(emitEnd && stream.readable) {
         stream.readable = false
@@ -141,7 +152,12 @@ module.exports = function (write, end) {
   stream.pause = function () {
     started = true
     stream.paused = true
+    stream.emit('_pause')
     return stream
+  }
+  stream._pause = function () {
+    stream.emit('_pause')
+    return this
   }
   stream.paused = true
   process.nextTick(function () {
