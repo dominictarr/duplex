@@ -1,26 +1,5 @@
 var Stream = require('stream')
 
-/*
-  lemmy think...
-
-    pause() and resume() must prevent data from being emitted.
-
-  write controls 'drain', and the return value.
-
-  idea:
-
-    write -> emit('_data')
-
-    on('pause') --> _paused = true
-    if(writePause) --> wirte() == false
-    on('drain') --> _paused = false
-
-    pause() -> paused = true
-    resume() -> paused = false, drain()
-    sendData(data) -> push onto buffer or emit.
-    sendEnd()      -> queue end after buffer clears.  
-*/
-
 module.exports = function (write, end) {
   var stream = new Stream() 
   var buffer = [], ended = false, destroyed = false, emitEnd
