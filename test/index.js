@@ -19,11 +19,11 @@ test("write(data) -> emit('_data', data)", function (d) {
 
 test("emit('pause') -> write(data) === false", function (d) {
   var a = null
-  assert(d.write(), true)
+  assert.equal(d.write(1), true)
   d.emit('pause')
-  assert(d.write(), false)
+  assert.equal(d.write(2), false)
   d.emit('drain')
-  assert(d.write(), true)
+  assert.equal(d.write(3), true)
 })
 
 test("_data(data) -> emit('data', data)", function (d) {
