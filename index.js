@@ -11,7 +11,6 @@ module.exports = function (write, end) {
   stream.writePause = false
   stream
     .on('pause', function () {
-      console.log('pause')
       stream.writePause = true //LEGACY, DO NOT USE
       stream._paused = true
     })
@@ -65,7 +64,7 @@ module.exports = function (write, end) {
   stream.emitEnd = //LEGACY, DO NOT USE
   stream.sendEnd = //LEGACY, DO NOT USE
   stream._end = function (data) { 
-    if(data) stream.emitData(data)
+    if(data) stream._data(data)
     if(emitEnd) return
     emitEnd = true
     //destroy is handled above.
@@ -75,7 +74,6 @@ module.exports = function (write, end) {
   stream.write = function (data) {
     stream.emit('write', data) //LEGACY, DO NOT USE
     stream.emit('_data', data)
-    console.log( 'write()', !stream._paused)
     return !stream._paused
   }
   stream.end = function () {
