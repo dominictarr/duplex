@@ -11,6 +11,7 @@ module.exports = function (write, end) {
   stream.writePause = false
   stream
     .on('pause', function () {
+      console.log('pause')
       stream.writePause = true //LEGACY, DO NOT USE
       stream._paused = true
     })
@@ -74,7 +75,8 @@ module.exports = function (write, end) {
   stream.write = function (data) {
     stream.emit('write', data) //LEGACY, DO NOT USE
     stream.emit('_data', data)
-    return !stream.writePaused
+    console.log( 'write()', !stream._paused)
+    return !stream._paused
   }
   stream.end = function () {
     stream.writable = false
@@ -135,12 +137,15 @@ module.exports = function (write, end) {
     return stream
   }
   stream._pause = function () {
-    stream.emit('_pause')
+    if(!stream._paused) {
+      stream._paused = true
+      stream.emit('pause')
+    }
     return this
   }
   stream.paused = true
   process.nextTick(function () {
-    //unless the user manually
+    //unless the user manually paused
     if(started) return
     stream.resume()
   })
