@@ -8,14 +8,11 @@ module.exports = function (write, end) {
   stream._paused = false
   stream.buffer = buffer
   
-  stream.writePause = false
   stream
     .on('pause', function () {
-      stream.writePause = true //LEGACY, DO NOT USE
       stream._paused = true
     })
     .on('drain', function () {
-      stream.writePause = false //LEGACY, DO NOT USE
       stream._paused = false
     })
    
@@ -24,9 +21,9 @@ module.exports = function (write, end) {
   }
 
   if(write)
-    stream.on('write', write)
+    stream.on('_data', write)
   if(end)
-    stream.on('ended', end)
+    stream.on('_end', end)
 
   //destroy the stream once both ends are over
   //but do it in nextTick, so that other listeners
@@ -51,8 +48,6 @@ module.exports = function (write, end) {
   // for pause state.
 
   
-  stream.emitData = //LEGACY, DO NOT USE
-  stream.sendData = //LEGACY, DO NOT USE
   stream._data = function (data) {
     if(!stream.paused && !buffer.length)
       stream.emit('data', data)
@@ -61,8 +56,6 @@ module.exports = function (write, end) {
     return !(stream.paused || buffer.length)
   }
 
-  stream.emitEnd = //LEGACY, DO NOT USE
-  stream.sendEnd = //LEGACY, DO NOT USE
   stream._end = function (data) { 
     if(data) stream._data(data)
     if(emitEnd) return
@@ -72,15 +65,14 @@ module.exports = function (write, end) {
   }
 
   stream.write = function (data) {
-    stream.emit('write', data) //LEGACY, DO NOT USE
     stream.emit('_data', data)
     return !stream._paused
   }
+
   stream.end = function () {
     stream.writable = false
     if(stream.ended) return
     stream.ended = true
-    stream.emit('ended') //LEGACY, DO NOT USE
     stream.emit('_end')
   }
 
@@ -92,7 +84,6 @@ module.exports = function (write, end) {
       if(buffer.length) {
         stream.emit('data', buffer.shift())
         if(buffer.length == 0) {
-          stream.emit('read-drain') //LEGACY, DO NOT USE
           stream.emit('_drain')
         }
       }
